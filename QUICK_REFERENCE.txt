@@ -1,0 +1,163 @@
+================================================================================
+                    DATABASE SETUP - QUICK REFERENCE
+================================================================================
+
+NEW DATABASE CREDENTIALS:
+  URL: https://puoedxxoxyrdlesdghyp.supabase.co
+  Anon Key: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InB1b2VkeHhveHlyZGxlc2RnaHlwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1NzI3NTksImV4cCI6MjA4NzE0ODc1OX0.oZEZjOLwzk4UBMpuGFyQVm3njX4zFH5sEA8WgXiC-tw
+  Service Role: Get from Supabase Dashboard → Settings → API
+
+================================================================================
+                            DATABASE STRUCTURE
+================================================================================
+
+CORE TABLES (4 ONLY):
+  1. users              - User accounts with purchaser_id column
+  2. products           - Product catalog with variants
+  3. orders             - Orders synced from Metabase
+  4. price_history      - Price changes and approval workflow
+
+VIEWS (3):
+  - product_summary
+  - supplier_order_stats
+  - pending_price_changes
+
+NO EXTRA TABLES:
+  ❌ supplier_purchaser (relationship in users.purchaser_id)
+  ❌ sessions, notifications, audit_log
+
+================================================================================
+                          IMPORTANT: ID STRUCTURE
+================================================================================
+
+USERS TABLE HAS TWO IDS + PURCHASER_ID:
+
+1. id (INTEGER - SERIAL)
+   - Auto-increment: 1, 2, 3...
+   - Used by: price_history.created_by_purchaser_id
+   - Used by: users.purchaser_id (suppliers reference their purchaser)
+
+2. user_id (TEXT - UNIQUE)
+   - Friendly ID: SUP001, PUR001, AGENT001...
+   - Used by: products.fk_owned_by
+   - Used by: orders.vendor_id
+   - Used by: price_history.created_by_supplier_id
+
+3. purchaser_id (INTEGER - NULLABLE)
+   - For suppliers only
+   - References users.id of the purchaser managing this supplier
+   - NULL for purchasers, agents, admins
+
+QUICK RULE:
+  - Suppliers → use user_id (TEXT) + have purchaser_id set
+  - Purchasers → use id (INTEGER) in relationships
+
+================================================================================
+                            SETUP COMMANDS
+================================================================================
+
+1. CREATE DATABASE:
+   - Open Supabase SQL Editor
+   - Run: backend/complete_database_setup.sql
+
+2. UPDATE FRONTEND:
+   cd frontend
+   cp .env.local.new .env.local
+   npm run dev
+
+3. UPDATE BACKEND:
+   cd backend
+   cp .env.local.new .env.local
+   # Edit .env.local - add your service role key
+   python main.py
+
+4. MIGRATE DATA (optional):
+   cd backend
+   python migrate_database.py
+
+================================================================================
+                          KEY DOCUMENTS
+================================================================================
+
+START HERE:
+  → NEW_DATABASE_SETUP_SUMMARY.md
+
+UNDERSTAND IDs:
+  → DATABASE_ID_STRUCTURE.md
+
+QUICK SETUP:
+  → QUICK_SETUP.md
+
+FULL MIGRATION:
+  → DATABASE_MIGRATION_GUIDE.md
+
+WHAT CHANGED:
+  → CHANGES_SUMMARY.md
+
+TRACK PROGRESS:
+  → MIGRATION_CHECKLIST.md
+
+================================================================================
+                          VERIFICATION
+================================================================================
+
+After setup, check:
+  ✓ 4 tables created (users, products, orders, price_history)
+  ✓ 3 views created
+  ✓ users table has id, user_id, AND purchaser_id columns
+  ✓ NO supplier_purchaser table (relationship in users.purchaser_id)
+  ✓ price_history has both supplier_id (TEXT) and purchaser_id (INTEGER)
+  ✓ Frontend connects successfully
+  ✓ Backend syncs orders
+
+================================================================================
+                          COMMON QUERIES
+================================================================================
+
+Get supplier's products:
+  SELECT * FROM products WHERE fk_owned_by = 'SUP001';
+
+Get purchaser's suppliers:
+  SELECT * FROM users
+  WHERE purchaser_id = 1 AND role = 'supplier';
+
+Get price history by supplier:
+  SELECT * FROM price_history WHERE created_by_supplier_id = 'SUP001';
+
+Get price history by purchaser:
+  SELECT * FROM price_history WHERE created_by_purchaser_id = 2;
+
+Convert user_id to id:
+  SELECT id FROM users WHERE user_id = 'SUP001';
+
+Convert id to user_id:
+  SELECT user_id FROM users WHERE id = 1;
+
+================================================================================
+                          TROUBLESHOOTING
+================================================================================
+
+"Table does not exist"
+  → Run complete_database_setup.sql in SQL Editor
+
+"Permission denied"
+  → Use service role key (not anon key) for backend
+
+"Type mismatch"
+  → Check if using correct ID type (INTEGER vs TEXT)
+
+"Foreign key violation"
+  → Verify using correct ID field for the table
+
+================================================================================
+                          ESTIMATED TIME
+================================================================================
+
+Quick Setup (no data):     15 minutes
+Full Migration (with data): 1-3 hours
+
+================================================================================
+
+Need help? Check DATABASE_ID_STRUCTURE.md for detailed ID usage guide!
+
+================================================================================

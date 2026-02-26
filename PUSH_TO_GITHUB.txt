@@ -1,0 +1,113 @@
+================================================================================
+                    PUSH TO GITHUB - QUICK COMMANDS
+================================================================================
+
+GitHub Username: wqrmhd177
+Repository URL: https://github.com/wqrmhd177/supplier-portal
+
+================================================================================
+                        STEP 1: CREATE REPOSITORY
+================================================================================
+
+1. Go to: https://github.com/new
+2. Repository name: supplier-portal
+3. Make it: Private (recommended)
+4. DO NOT initialize with README
+5. Click: Create repository
+
+================================================================================
+                        STEP 2: RUN THESE COMMANDS
+================================================================================
+
+Open PowerShell/Terminal in project folder and run:
+
+cd "C:\Users\Admin\Downloads\Supplier Portal\Supplier Portal"
+
+git init
+
+git config user.name "wqrmhd177"
+git config user.email "your-email@example.com"
+
+git add .
+
+git commit -m "Initial commit: Supplier Portal with 4-table database structure"
+
+git remote add origin https://github.com/wqrmhd177/supplier-portal.git
+
+git branch -M main
+
+git push -u origin main
+
+================================================================================
+                        AUTHENTICATION
+================================================================================
+
+When prompted for credentials:
+- Username: wqrmhd177
+- Password: Use Personal Access Token (not your GitHub password)
+
+To create Personal Access Token:
+1. Go to: https://github.com/settings/tokens
+2. Generate new token (classic)
+3. Select scope: repo (all)
+4. Copy token and use as password
+
+================================================================================
+                        VERIFY SENSITIVE FILES
+================================================================================
+
+Before pushing, ensure these are NOT in git:
+
+❌ .env.local
+❌ frontend/.env.local
+❌ backend/.env.local
+❌ Any files with passwords/keys
+
+✅ .env.local.new (templates are OK)
+
+The .gitignore file will automatically exclude these.
+
+================================================================================
+                        AFTER FIRST PUSH
+================================================================================
+
+For future updates:
+
+git add .
+git commit -m "Description of your changes"
+git push
+
+================================================================================
+                        TROUBLESHOOTING
+================================================================================
+
+If "remote origin already exists":
+  git remote remove origin
+  git remote add origin https://github.com/wqrmhd177/supplier-portal.git
+
+If authentication fails:
+  Use Personal Access Token instead of password
+  Get token from: https://github.com/settings/tokens
+
+If push rejected:
+  git pull origin main --allow-unrelated-histories
+  git push -u origin main
+
+================================================================================
+                        GITHUB SECRETS (IMPORTANT)
+================================================================================
+
+After pushing, add these secrets for GitHub Actions:
+
+Go to: Repository → Settings → Secrets and variables → Actions
+
+Add:
+- SUPABASE_URL = https://puoedxxoxyrdlesdghyp.supabase.co
+- SUPABASE_SERVICE_ROLE_KEY = your_service_role_key
+
+================================================================================
+
+Your repository will be at:
+https://github.com/wqrmhd177/supplier-portal
+
+================================================================================
